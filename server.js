@@ -26,6 +26,12 @@ app.use(session({
     resave: false
 }));
 
+app.use(fileupload({
+    limits: { fileSize: 5242880 },
+    abortOnLimit: true,
+    responseOnLimit: 'El peso del archivo supera el máximo (5Mb)'
+}))
+
 app.use(require('./routes/routes.js'))
 
 app.listen(3000, () => console.log('Servidor corriendo en el puerto 3000'))
