@@ -14,6 +14,11 @@
     <link rel="stylesheet" href="/css/estilos.css" />
   </head>
   <body>
+    {% for error in errors %}
+      <div class="alert alert-danger" role="alert">
+        <strong>ERROR!</strong> {{ error }}
+      </div>
+    {% endfor %}
     <h1>Skate Park</h1>
 
     <div class="py-4">
@@ -48,11 +53,11 @@
           </div>
           <div class="form-group col-12 col-sm-12">
             <label>Foto de perfil</label>
-            <input name="img" type="file" />
+            <input required name="img" type="file" />
           </div>
         </div>
         <button class="btn btn-info mb-3">Registrarme</button>
-        <p><a href="#"> Iniciar sesión</a></p>
+        <p><a href="/login"> Iniciar sesión</a></p>
       </form>
     </div>
   </body>

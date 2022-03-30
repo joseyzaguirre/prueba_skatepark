@@ -2,19 +2,33 @@ const express = require('express')
 
 const router = express.Router()
 
-const { registerUser, getUserEmail, newId } = require('../db.js')
+const { registerUser, getUser, getUsers, newId } = require('../db.js')
 
-router.get('/', (req, res) => {
-
-    res.render('index.html')
+router.get('/', async (req, res) => {
+    const users = await getUsers()
+    res.render('index.html', { users})
 });
 
 router.get('/login', (req, res) => {
+    const success = req.flash('success')
+    const errors = req.flash('errors')
+    
+    if (errors.length > 0) {
+        return res.render('login.html', { errors })
+    }
 
+    if (success.length > 0) {
+        return res.render('login.html', { success })
+    }
     res.render('login.html')
 })
 
 router.get('/registro', (req, res) => {
+    const errors = req.flash('errors')
+
+    if (errors.length > 0) {
+        return res.render('registro.html', { errors })
+    }
 
     res.render('registro.html')
 })
@@ -28,31 +42,56 @@ router.post('/registro', async (req, res) => {
     const experiencia = req.body.experiencia
     const especialidad = req.body.especialidad
 
-    const imagen = req.files.img
-    const extension = imagen.name.split('.')[1]
-
     let usuarioId = await newId();
     usuarioId = usuarioId.toString();
 
+    const imagen = req.files.img
+    const extension = imagen.name.split('.')[1]
+
     if (password != password2 ) {
-        return res.send('Las contraseñas no coinciden')
+        req.flash('errors', 'las contraseñas deben ser iguales')
+        return res.redirect('/registro')
     }
 
-    let user = await getUserEmail(email)
+    let user = await getUser(email)
 
     if (user) {
-        return res.send('Un usuario con éste email ya se encuentra registrado')
+        req.flash('errors', 'El email insertado ya se encuentra registrado')
+        return res.redirect('/registro')
     }
 
     if ((extension != 'jpg' && extension != 'jpeg' && extension != 'png') || imagen.size > 5242880) {
-        return res.send('formato de imagen inválido o imagen excede el peso límite: Recuerda que sólo se permiten imágenes en formato jpg, jpeg o png que no superen los 5mb')
+        req.flash('errors', 'Imagen inválida: Recuerda que sólo se permiten imágenes jpg, jpeg o png y ésta no debe superar de tamaño los 5mb')
+        return res.redirect('/registro')
     }
+
+    req.flash('success', 'Te has registrado exitosamente, ya puedes iniciar sesión')
     
     const rutaImagen = `imgs/AvatarUsuario${usuarioId}.${extension}`
     await imagen.mv(`static/${rutaImagen}`)
 
     await registerUser(email, nombre, password, experiencia, especialidad, rutaImagen)
-    res.send('holiiiii')
+    res.redirect('/login')
+})
+
+router.post('/login', async (req, res) => {
+    email = req.body.email
+    password = req.body.password
+    console.log(email, password)
+    const user = await getUser(email)
+    console.log(user)
+
+    if (user == undefined) {
+        req.flash('errors', 'Usuario no registrado')
+        return res.redirect('/login')
+    }
+
+    if (password != user.password) {
+        req.flash('errors', 'Contraseña incorrecta')
+        return res.redirect('/login')
+    }
+
+    res.send('jiji')
 })
 
 

@@ -23,7 +23,7 @@ async function registerUser(email, nombre, password, experiencia, especialidad, 
     client.release()
 }
 
-async function getUserEmail(email) {
+async function getUser(email) {
     const client = await pool.connect()
 
     const res = await client.query({
@@ -40,6 +40,16 @@ async function getUserEmail(email) {
     return res.rows[0]
 }
 
+async function getUsers() {
+    const client = await pool.connect()
+
+    const res = await client.query('select * from skaters')
+
+    client.release()
+
+    return res.rows
+}
+
 async function newId() {
     const client = await pool.connect()
 
@@ -54,4 +64,4 @@ async function newId() {
     return (res.rows[0].max + 1) 
 }
 
-module.exports = { registerUser, getUserEmail, newId }
+module.exports = { registerUser, getUser, getUsers, newId }
