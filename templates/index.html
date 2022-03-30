@@ -57,10 +57,30 @@
             <td>Ollie</td>
             <td class="text-warning font-weight-bold">En revisión</td>
           </tr>
+          {% for user in users %}
+          <tr>
+              <td>{{ user.id }}</td>
+              <td>
+                  <div>
+                      <img src="{{user.foto}}" alt="foto" width="60" height="60">
+                  </div>
+              </td>
+              <td>{{ user.nombre }}</td>
+              <td>{{ user.anos_experiencia }}</td>
+              <td>{{ user.especialidad }}</td>
+              <td>
+                  <a>{% if user.estado %}
+                    <p class="text-success font-weight-bold">Aprobado</p>
+                  {% else %}
+                    <p class="text-warning font-weight-bold">En revision</p>
+                  {% endif %}</a>
+              </td>
+          </tr>
+          {% endfor %}
         </tbody>
       </table>
-      <a href="#">Iniciar Sesión</a> |
-      <a href="#">Registrarme</a>
+      <a href="/login">Iniciar Sesión</a> |
+      <a href="/registro">Registrarme</a>
     </div>
   </body>
 </html>
