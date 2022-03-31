@@ -5,9 +5,9 @@ const router = express.Router()
 const { registerUser, getUser, getUsers, newId } = require('../db.js')
 
 router.get('/', async (req, res) => {
-    console.log(req.session.user)
     const users = await getUsers()
-    res.render('index.html', { users })
+    const user = req.session.user
+    res.render('index.html', { users, user } )
 });
 
 router.get('/login', (req, res) => {
@@ -32,6 +32,21 @@ router.get('/registro', (req, res) => {
     }
 
     res.render('registro.html')
+})
+
+router.get('/admin', (req, res) => {
+    const user = req.session.user
+    res.render('admin.html', { user })
+})
+
+router.get('/datos', (req, res) => {
+    const user = req.session.user
+    res.render('datos.html', { user })
+})
+
+router.get('/logout', (req, res) => {
+    req.session.user = undefined
+    res.redirect('/')
 })
 
 router.post('/registro', async (req, res) => {
