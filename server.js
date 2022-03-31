@@ -20,7 +20,7 @@ nunjucks.configure('templates',{
 });
 
 app.use(session({
-    secret: "password123",
+    secret: 'mi-clave',
     saveUninitialized:true,
     cookie: { maxAge: 60*60*1000*24 }, // 1 día
     resave: false

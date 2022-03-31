@@ -5,8 +5,9 @@ const router = express.Router()
 const { registerUser, getUser, getUsers, newId } = require('../db.js')
 
 router.get('/', async (req, res) => {
+    console.log(req.session.user)
     const users = await getUsers()
-    res.render('index.html', { users})
+    res.render('index.html', { users })
 });
 
 router.get('/login', (req, res) => {
@@ -77,9 +78,7 @@ router.post('/registro', async (req, res) => {
 router.post('/login', async (req, res) => {
     email = req.body.email
     password = req.body.password
-    console.log(email, password)
     const user = await getUser(email)
-    console.log(user)
 
     if (user == undefined) {
         req.flash('errors', 'Usuario no registrado')
@@ -90,8 +89,8 @@ router.post('/login', async (req, res) => {
         req.flash('errors', 'Contraseña incorrecta')
         return res.redirect('/login')
     }
-
-    res.send('jiji')
+    req.session.user = user
+    res.redirect('/')
 })
 
 
