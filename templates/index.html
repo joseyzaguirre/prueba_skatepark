@@ -1,5 +1,10 @@
 {% extends 'layout.html' %}
   {% block contenido %}
+    {% for error in errors %}
+      <div class="alert alert-danger" role="alert">
+        <strong>ERROR!</strong> {{ error }}
+      </div>
+    {% endfor %}
     <h1>Skate Park</h1>
 
     <div class="py-4">

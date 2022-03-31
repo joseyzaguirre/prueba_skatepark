@@ -4,13 +4,34 @@ const router = express.Router()
 
 const { registerUser, getUser, getUsers, newId } = require('../db.js')
 
+function protected_routes (req, res, next) {
+    
+    if (!req.session.user) {
+        req.flash('errors', 'Ruta protegida. Necesitas iniciar sesión para poder acceder')
+        return res.redirect('/login')
+    }
+
+    next()
+}
+
+function loggedRoutes (req, res, next) {
+
+    if (req.session.user) {
+        req.flash('errors', 'Ya iniciaste sesión, debes hacer logout para poder acceder a dicha ruta')
+        return res.redirect('/')
+    }
+
+    next()
+}
+
 router.get('/', async (req, res) => {
     const users = await getUsers()
     const user = req.session.user
-    res.render('index.html', { users, user } )
+    const errors = req.flash('errors')
+    res.render('index.html', { users, user, errors } )
 });
 
-router.get('/login', (req, res) => {
+router.get('/login', loggedRoutes, (req, res) => {
     const success = req.flash('success')
     const errors = req.flash('errors')
     
@@ -24,7 +45,7 @@ router.get('/login', (req, res) => {
     res.render('login.html')
 })
 
-router.get('/registro', (req, res) => {
+router.get('/registro', loggedRoutes, (req, res) => {
     const errors = req.flash('errors')
 
     if (errors.length > 0) {
@@ -34,12 +55,12 @@ router.get('/registro', (req, res) => {
     res.render('registro.html')
 })
 
-router.get('/admin', (req, res) => {
+router.get('/admin', protected_routes, (req, res) => {
     const user = req.session.user
     res.render('admin.html', { user })
 })
 
-router.get('/datos', (req, res) => {
+router.get('/datos', protected_routes, (req, res) => {
     const user = req.session.user
     res.render('datos.html', { user })
 })
