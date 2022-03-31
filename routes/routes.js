@@ -1,4 +1,5 @@
 const express = require('express')
+const bcrypt = require('bcrypt')
 
 const router = express.Router()
 
@@ -107,7 +108,9 @@ router.post('/registro', async (req, res) => {
     const rutaImagen = `imgs/AvatarUsuario${usuarioId}.${extension}`
     await imagen.mv(`static/${rutaImagen}`)
 
-    await registerUser(email, nombre, password, experiencia, especialidad, rutaImagen)
+    const encryptedPass = await bcrypt.hash(password, 10)
+
+    await registerUser(email, nombre, encryptedPass, experiencia, especialidad, rutaImagen)
     res.redirect('/login')
 })
 
@@ -121,7 +124,9 @@ router.post('/login', async (req, res) => {
         return res.redirect('/login')
     }
 
-    if (password != user.password) {
+    const passCheck = await bcrypt.compare(password, user.password)
+
+    if ( !passCheck ) {
         req.flash('errors', 'Contraseña incorrecta')
         return res.redirect('/login')
     }
