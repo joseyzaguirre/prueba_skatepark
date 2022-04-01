@@ -36,14 +36,7 @@ router.get('/login', loggedRoutes, (req, res) => {
     const success = req.flash('success')
     const errors = req.flash('errors')
     
-    if (errors.length > 0) {
-        return res.render('login.html', { errors })
-    }
-
-    if (success.length > 0) {
-        return res.render('login.html', { success })
-    }
-    res.render('login.html')
+    res.render('login.html', { errors, success })
 })
 
 router.get('/registro', loggedRoutes, (req, res) => {
@@ -62,7 +55,6 @@ router.get('/admin', protected_routes, async (req, res) => {
 router.get('/datos', protected_routes, (req, res) => {
     const user = req.session.user
     const errors = req.flash('errors')
-    console.log(user)
     res.render('datos.html', { user, errors })
 })
 
