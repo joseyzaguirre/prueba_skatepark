@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt')
 
 const router = express.Router()
 
-const { registerUser, getUser, getUsers, newId } = require('../db.js')
+const { registerUser, getUser, getUsers, newId, setAuth } = require('../db.js')
 
 function protected_routes (req, res, next) {
     
@@ -56,9 +56,10 @@ router.get('/registro', loggedRoutes, (req, res) => {
     res.render('registro.html')
 })
 
-router.get('/admin', protected_routes, (req, res) => {
+router.get('/admin', protected_routes, async (req, res) => {
+    const users = await getUsers()
     const user = req.session.user
-    res.render('admin.html', { user })
+    res.render('admin.html', { users, user })
 })
 
 router.get('/datos', protected_routes, (req, res) => {
@@ -132,6 +133,14 @@ router.post('/login', async (req, res) => {
     }
     req.session.user = user
     res.redirect('/')
+})
+
+router.put('/users/:id', async (req, res) => {
+    const id = req.params.id
+    const auth = req.body.auth
+    await setAuth(id, auth)
+
+    res.send('okeeeei')
 })
 
 

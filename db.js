@@ -23,6 +23,17 @@ async function registerUser(email, nombre, password, experiencia, especialidad, 
     client.release()
 }
 
+async function setAuth(id, auth) {
+    const client = await pool.connect()
+
+    await client.query({
+        text: 'update skaters set estado=$2 where id=$1',
+        values: [Number(id), auth]
+    })
+
+    client.release()
+}
+
 async function getUser(email) {
     const client = await pool.connect()
 
@@ -43,7 +54,7 @@ async function getUser(email) {
 async function getUsers() {
     const client = await pool.connect()
 
-    const res = await client.query('select * from skaters')
+    const res = await client.query('select * from skaters order by id')
 
     client.release()
 
@@ -64,4 +75,4 @@ async function newId() {
     return (res.rows[0].max + 1) 
 }
 
-module.exports = { registerUser, getUser, getUsers, newId }
+module.exports = { registerUser, getUser, getUsers, newId, setAuth }

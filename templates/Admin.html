@@ -42,7 +42,24 @@
             <td>Ollie</td>
             <td><input type="checkbox" /></td>
           </tr>
+          {% for user in users %}
+          <tr>
+              <td>{{ user.id }}</td>
+              <td>
+                  <div>
+                      <img src="{{user.foto}}" alt="photo" width="60" height="60">
+                  </div>
+              </td>
+              <td>{{ user.nombre }}</td>
+              <td>{{ user.anos_experiencia }}</td>
+              <td>{{ user.especialidad }}</td>
+              <td><input data-id="{{ user.id }}" type="checkbox" class="auth" {% if user.estado %} checked {% endif %}></td>
+          </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
+  {% endblock %}
+  {% block scripts %}
+    <script src="/js/frontend.js"></script>
   {% endblock %}
