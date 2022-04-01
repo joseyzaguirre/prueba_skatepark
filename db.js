@@ -61,6 +61,28 @@ async function getUsers() {
     return res.rows
 }
 
+async function editUser (nombre, password, experiencia, especialidad, id) {
+    const client = await pool.connect()
+
+    await client.query({
+        text: "update skaters set nombre=$1, password=$2, anos_experiencia=$3, especialidad=$4 where id=$5",
+        values: [nombre, password, experiencia, especialidad, id]
+    })
+
+    client.release()
+}
+
+async function deleteUser (id) {
+    const client = await pool.connect()
+
+    await client.query({
+        text: "delete from skaters where id=$1",
+        values: [id]
+    })
+
+    client.release()
+}
+
 async function newId() {
     const client = await pool.connect()
 
@@ -75,4 +97,4 @@ async function newId() {
     return (res.rows[0].max + 1) 
 }
 
-module.exports = { registerUser, getUser, getUsers, newId, setAuth }
+module.exports = { registerUser, getUser, getUsers, editUser, deleteUser, newId, setAuth }

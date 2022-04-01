@@ -5,6 +5,11 @@
         <strong>ERROR!</strong> {{ error }}
       </div>
     {% endfor %}
+    {% for mensaje in success %}
+    <div class="alert alert-success" role="alert">
+      <strong>SUCCESS!</strong> {{ mensaje }}
+    </div>
+    {% endfor %}
     <h1>Skate Park</h1>
 
     <div class="py-4">

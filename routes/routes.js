@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt')
 
 const router = express.Router()
 
-const { registerUser, getUser, getUsers, newId, setAuth } = require('../db.js')
+const { registerUser, getUser, getUsers, editUser, newId, setAuth, deleteUser } = require('../db.js')
 
 function protected_routes (req, res, next) {
     
@@ -48,12 +48,9 @@ router.get('/login', loggedRoutes, (req, res) => {
 
 router.get('/registro', loggedRoutes, (req, res) => {
     const errors = req.flash('errors')
+    const success = req.flash('success')
 
-    if (errors.length > 0) {
-        return res.render('registro.html', { errors })
-    }
-
-    res.render('registro.html')
+    res.render('registro.html', { errors, success })
 })
 
 router.get('/admin', protected_routes, async (req, res) => {
@@ -64,7 +61,9 @@ router.get('/admin', protected_routes, async (req, res) => {
 
 router.get('/datos', protected_routes, (req, res) => {
     const user = req.session.user
-    res.render('datos.html', { user })
+    const errors = req.flash('errors')
+    console.log(user)
+    res.render('datos.html', { user, errors })
 })
 
 router.get('/logout', (req, res) => {
@@ -113,6 +112,37 @@ router.post('/registro', async (req, res) => {
 
     await registerUser(email, nombre, encryptedPass, experiencia, especialidad, rutaImagen)
     res.redirect('/login')
+})
+
+router.post('/editarPerfil', async (req, res) => {
+    const id = req.session.user.id
+    const nombre = req.body.nombre
+    const password = req.body.password
+    const password2 = req.body.password2
+    const experiencia = req.body.experiencia
+    const especialidad = req.body.especialidad
+
+    if (password != password2) {
+        req.flash('errors', 'Las contraseñas deben ser iguales')
+        return res.redirect('/datos')
+    }
+
+    const encryptedPass = await bcrypt.hash(password, 10)
+    
+    req.flash('success', 'Has modificado tus datos exitosamente, por favor inicia sesión nuevamente')
+    await editUser(nombre, encryptedPass, experiencia, especialidad, id)
+    req.session.user = undefined
+
+
+    res.redirect('/login')
+})
+
+router.post('/deleteUser', async (req, res) => {
+    const id = req.session.user.id
+    await deleteUser(id)
+    req.flash('success', 'Cuenta eliminada exitosamente, puedes crearte una cuenta nueva cuando desees')
+    req.session.user = undefined
+    res.redirect('/registro')
 })
 
 router.post('/login', async (req, res) => {
